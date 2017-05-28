@@ -1,0 +1,20 @@
+{
+	"FileVersion":		3,
+
+	"FriendlyName": 	"UE4Duino",
+	"Version":			2,
+	"VersionName":		"2.0.0",
+	"CreatedBy":		"Rodrigo Villani",
+	"EngineVersion":	"4.11.0",
+	"Description":		"Enables communication between UE4 and Arduino",
+	"Category":			"Input",
+	
+	"EnabledByDefault":	true,
+
+	"Modules": [
+		{
+			"Name": "UE4Duino",
+			"Type": "Runtime"
+		}
+	]
+}
