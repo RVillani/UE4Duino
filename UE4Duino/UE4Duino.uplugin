@@ -1,13 +1,13 @@
 {
-	"FileVersion":		3,
+	"FileVersion":    3,
 
-	"FriendlyName": 	"UE4Duino",
-	"Version":			2,
-	"VersionName":		"2.0.0",
-	"CreatedBy":		"Rodrigo Villani",
-	"EngineVersion":	"4.11.0",
-	"Description":		"Enables communication between UE4 and Arduino",
-	"Category":			"Input",
+	"FriendlyName":   "UE4Duino",
+	"Version":        2,
+	"VersionName":    "2.0.1",
+	"CreatedBy":      "Rodrigo Villani",
+	"EngineVersion":	"4.16.0",
+	"Description":		"Enables communication between UE4 and COM ports",
+	"Category":       "Input",
 	
 	"EnabledByDefault":	true,
 

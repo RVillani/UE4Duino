@@ -1,4 +1,3 @@
-#include "UE4DuinoPCH.h"
 #include "UE4DuinoModule.h"
 
 IMPLEMENT_MODULE(UE4DuinoModule, UE4Duino);

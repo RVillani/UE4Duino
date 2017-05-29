@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ModuleManager.h"
+
 DECLARE_LOG_CATEGORY_CLASS(UE4DuinoLog, Log, All);
 
 class UE4DuinoModule : public IModuleInterface

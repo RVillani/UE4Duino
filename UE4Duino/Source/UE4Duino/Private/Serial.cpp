@@ -1,6 +1,5 @@
 //Based off the "Arduino and C++ (for Windows)" code found at: http://playground.arduino.cc/Interfacing/CPPWindows
 
-#include "UE4DuinoPCH.h"
 #include "Serial.h"
 
 #define BOOL2bool(B) B == 0 ? false : true
@@ -16,6 +15,7 @@ USerial::USerial()
 	: m_hIDComDev(NULL)
 	, m_Port(-1)
 	, m_Baud(-1)
+	, WriteLineEnd(ELineEnd::n)
 {
 	FMemory::Memset(&m_OverlappedRead, 0, sizeof(OVERLAPPED));
 	FMemory::Memset(&m_OverlappedWrite, 0, sizeof(OVERLAPPED));
@@ -36,8 +36,8 @@ bool USerial::Open(int32 nPort, int32 nBaud)
 	if (m_hIDComDev)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Trying to use opened Serial instance to open a new one. "
-				"Instance port: %d | Port tried: %d"), m_Port, nPort);
-		return true;
+				"Current open instance port: %d | Port tried: %d"), m_Port, nPort);
+		return false;
 	}
 
 	FString szPort = FString::Printf(nPort < 10 ? TEXT("COM%d") : TEXT("\\\\.\\COM%d"), nPort);
@@ -146,6 +146,11 @@ FString USerial::ReadStringUntil(bool &bSuccess, uint8 Terminator)
 
 		if (Byte == Terminator || dwBytesRead == 0)
 		{
+			// when Terminator is \n, we know we're expecting lines from Arduino. But those
+			// are ended in \r\n. That means that if we found the line Terminator (\n), our previous
+			// character was \r, so we remove that from the array.
+			if (Terminator == '\n' && Chars.Top() == '\r') Chars.Pop(false);
+
 			Chars.Add(0x0);
 			break;
 		}
@@ -266,7 +271,7 @@ bool USerial::Print(FString String)
 
 bool USerial::Println(FString String)
 {
-	return Print(String + "\n");
+	return Print(String + LineEndToStr(WriteLineEnd));
 }
 
 bool USerial::WriteFloat(float Value)
@@ -324,4 +329,21 @@ void USerial::Flush()
 	do {
 		Data = ReadBytes(8192);
 	} while (Data.Num() > 0);
+}
+
+FString USerial::LineEndToStr(ELineEnd LineEnd)
+{
+	switch (LineEnd)
+	{
+	case ELineEnd::rn:
+		return TEXT("\r\n");
+	case ELineEnd::n:
+		return TEXT("\n");
+	case ELineEnd::r:
+		return TEXT("\r");
+	case ELineEnd::nr:
+		return TEXT("\n\r");
+	default:
+		return TEXT("null");
+	}
 }
