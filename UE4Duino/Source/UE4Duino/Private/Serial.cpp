@@ -11,6 +11,40 @@ USerial* USerial::OpenComPort(bool &bOpened, int32 Port, int32 BaudRate)
 	return Serial;
 }
 
+int32 USerial::BytesToInt(TArray<uint8> Bytes)
+{
+	if (Bytes.Num() != 4)
+	{
+		return 0;
+	}
+
+	return *reinterpret_cast<int32*>(Bytes.GetData());
+}
+
+TArray<uint8> USerial::IntToBytes(const int32 &Int)
+{
+	TArray<uint8> Bytes;
+	Bytes.Append(reinterpret_cast<const uint8*>(&Int), 4);
+	return Bytes;
+}
+
+float USerial::BytesToFloat(TArray<uint8> Bytes)
+{
+	if (Bytes.Num() != 4)
+	{
+		return 0;
+	}
+
+	return *reinterpret_cast<float*>(Bytes.GetData());
+}
+
+TArray<uint8> USerial::FloatToBytes(const float &Float)
+{
+	TArray<uint8> Bytes;
+	Bytes.Append(reinterpret_cast<const uint8*>(&Float), 4);
+	return Bytes;
+}
+
 USerial::USerial()
 	: m_hIDComDev(NULL)
 	, m_Port(-1)

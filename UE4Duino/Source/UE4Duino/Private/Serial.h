@@ -51,6 +51,42 @@ public:
 	static USerial* OpenComPort(bool &bOpened, int32 Port = 1, int32 BaudRate = 9600);
 
 	/**
+	* Utility function to convert 4 bytes into an Integer. If the input array's length is not 4, returns 0.
+	* 
+	* @param Bytes A byte array with 4 values representing the integer in little-endian format.
+	* @return The final integer value or 0 for an invalid array.
+	*/
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Bytes to Int"), Category = "UE4Duino", meta = (Keywords = "cast concatenate group bit bitwise"))
+	static int32 BytesToInt(TArray<uint8> Bytes);
+
+	/**
+	* Utility function to get the 4 bytes that make an integer.
+	*
+	* @param Int The integer value to be converted.
+	* @return A byte array containing the 4 bytes that make the integer, starting from the least significant one (little endian).
+	*/
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Int to Bytes"), Category = "UE4Duino", meta = (Keywords = "cast separate bit bitwise"))
+	static TArray<uint8> IntToBytes(const int32 &Int);
+
+	/**
+	* Utility function to convert 4 bytes into a float. If the input array's length is not 4, returns 0.0.
+	*
+	* @param Bytes A byte array with 4 values representing the float in IEEE 754 standard format.
+	* @return The final float value or 0.0 for an invalid array.
+	*/
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Bytes to Float"), Category = "UE4Duino", meta = (Keywords = "cast concatenate group bit bitwise"))
+	static float BytesToFloat(TArray<uint8> Bytes);
+
+	/**
+	* Utility function to get the 4 bytes that make a float.
+	*
+	* @param Float The float value to be converted.
+	* @return A byte array containing the 4 bytes that make the float, in IEEE 754 standard format.
+	*/
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Float to Bytes"), Category = "UE4Duino", meta = (Keywords = "cast separate bit bitwise"))
+	static TArray<uint8> FloatToBytes(const float &Float);
+
+	/**
 	* Open a serial port. Don't forget to close the port before exiting the game.
 	* If this Serial instance has already an opened port,
 	* return false and doesn't change the opened port number.
