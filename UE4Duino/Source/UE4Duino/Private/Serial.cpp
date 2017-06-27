@@ -182,8 +182,8 @@ FString USerial::ReadStringUntil(bool &bSuccess, uint8 Terminator)
 		{
 			// when Terminator is \n, we know we're expecting lines from Arduino. But those
 			// are ended in \r\n. That means that if we found the line Terminator (\n), our previous
-			// character was \r, so we remove that from the array.
-			if (Terminator == '\n' && Chars.Top() == '\r') Chars.Pop(false);
+			// character could be \r. If it is, we remove that from the array.
+			if (Chars.Num() > 0 && Terminator == '\n' && Chars.Top() == '\r') Chars.Pop(false);
 
 			Chars.Add(0x0);
 			break;
