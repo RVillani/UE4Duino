@@ -5,7 +5,6 @@
 	"Version":        2,
 	"VersionName":    "2.2.1",
 	"CreatedBy":      "Rodrigo Villani",
-	"EngineVersion":	"4.16",
 	"Description":		"Enables communication between UE4 and COM ports",
 	"Category":       "Input",
 	
