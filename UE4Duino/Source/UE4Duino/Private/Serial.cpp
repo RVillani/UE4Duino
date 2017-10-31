@@ -78,7 +78,12 @@ bool USerial::Open(int32 nPort, int32 nBaud)
 	DCB dcb;
 
 	m_hIDComDev = CreateFile(*szPort, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
-	if (m_hIDComDev == NULL) return false;
+	if (m_hIDComDev == NULL)
+	{
+		unsigned long dwError = GetLastError();
+		UE_LOG(LogTemp, Error, TEXT("Failed to open port COM%d (%s). Error: %08X"), nPort, *szPort, dwError);
+		return false;
+	}
 
 	FMemory::Memset(&m_OverlappedRead, 0, sizeof(OVERLAPPED));
 	FMemory::Memset(&m_OverlappedWrite, 0, sizeof(OVERLAPPED));
@@ -110,7 +115,7 @@ bool USerial::Open(int32 nPort, int32 nBaud)
 		if (m_OverlappedWrite.hEvent != NULL) CloseHandle(m_OverlappedWrite.hEvent);
 		CloseHandle(m_hIDComDev);
 		m_hIDComDev = NULL;
-		UE_LOG(LogTemp, Error, TEXT("Failed to open port COM%d. Error: %08X"), nPort, dwError);
+		UE_LOG(LogTemp, Error, TEXT("Failed to setup port COM%d. Error: %08X"), nPort, dwError);
 		return false;
 	}
 
