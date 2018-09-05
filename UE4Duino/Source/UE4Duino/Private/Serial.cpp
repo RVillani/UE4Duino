@@ -74,7 +74,11 @@ bool USerial::Open(int32 nPort, int32 nBaud)
 		return false;
 	}
 
-	FString szPort = FString::Printf(nPort < 10 ? TEXT("COM%d") : TEXT("\\\\.\\COM%d"), nPort);
+	FString szPort;
+	if (nPort < 10)
+		szPort = FString::Printf(TEXT("COM%d"));
+	else
+		szPort = FString::Printf(TEXT("\\\\.\\COM%d"));
 	DCB dcb;
 
 	m_hIDComDev = CreateFile(*szPort, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);

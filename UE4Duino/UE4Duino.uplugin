@@ -8,7 +8,7 @@
 	"Description":		"Enables communication between UE4 and COM ports",
 	"Category":			"Input",
 	
-	"EnabledByDefault":	true,
+	"EnabledByDefault":	false,
 
 	"Modules": [
 		{
