@@ -12,9 +12,13 @@
 
 	"Modules": [
 		{
-			"Name":			"UE4Duino",
-			"Type":			"Runtime",
-			"LoadingPhase":	"PreDefault"
+			"Name":					"UE4Duino",
+			"Type":					"Runtime",
+			"LoadingPhase":			"PreDefault",
+			"WhitelistPlatforms":	[
+				"Win32",
+				"Win64"
+			]
 		}
 	]
 }
