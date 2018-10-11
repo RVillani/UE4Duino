@@ -10,9 +10,9 @@
 #define ASCII_XON       0x11
 #define ASCII_XOFF      0x13
 
-#include "AllowWindowsPlatformTypes.h"
+#include "Windows/AllowWindowsPlatformTypes.h"
 #include "windows.h"
-#include "HideWindowsPlatformTypes.h"
+#include "Windows/HideWindowsPlatformTypes.h"
 #include "CoreTypes.h"
 #include "Serial.generated.h"
 
