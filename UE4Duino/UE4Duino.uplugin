@@ -3,7 +3,7 @@
 
 	"FriendlyName":		"UE4Duino",
 	"Version":			2,
-	"VersionName":		"2.2.3",
+	"VersionName":		"2.2.4",
 	"CreatedBy":		"Rodrigo Villani",
 	"Description":		"Enables communication between UE4 and COM ports",
 	"Category":			"Input",
