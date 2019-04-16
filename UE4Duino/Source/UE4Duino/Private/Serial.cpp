@@ -46,10 +46,10 @@ TArray<uint8> USerial::FloatToBytes(const float &Float)
 }
 
 USerial::USerial()
-	: m_hIDComDev(NULL)
+	: WriteLineEnd(ELineEnd::n)
+	, m_hIDComDev(NULL)
 	, m_Port(-1)
 	, m_Baud(-1)
-	, WriteLineEnd(ELineEnd::n)
 {
 	FMemory::Memset(&m_OverlappedRead, 0, sizeof(OVERLAPPED));
 	FMemory::Memset(&m_OverlappedWrite, 0, sizeof(OVERLAPPED));
