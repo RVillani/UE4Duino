@@ -26,7 +26,7 @@ enum class ELineEnd : uint8
 };
 
 UCLASS(BlueprintType, Category = "UE4Duino", meta = (Keywords = "com arduino serial"))
-class USerial : public UObject
+class UE4DUINO_API USerial : public UObject
 {
 	GENERATED_BODY()
 
