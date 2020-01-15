@@ -51,7 +51,7 @@ TArray<uint8> USerial::FloatToBytes(const float &Float)
 
 USerial::USerial()
 	: WriteLineEnd(ELineEnd::n)
-	, m_hIDComDev(NULL)
+	, m_hIDComDev(nullptr)
 	, m_OverlappedRead(nullptr)
 	, m_OverlappedWrite(nullptr)
 	, m_Port(-1)
