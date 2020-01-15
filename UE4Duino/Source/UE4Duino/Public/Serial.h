@@ -10,11 +10,11 @@
 #define ASCII_XON       0x11
 #define ASCII_XOFF      0x13
 
-#include "Windows/AllowWindowsPlatformTypes.h"
-#include "windows.h"
-#include "Windows/HideWindowsPlatformTypes.h"
 #include "CoreTypes.h"
 #include "Serial.generated.h"
+
+// Forward declaration
+typedef struct _OVERLAPPED OVERLAPPED;
 
 UENUM(BlueprintType, Category = "UE4Duino")
 enum class ELineEnd : uint8
@@ -234,7 +234,10 @@ public:
 	
 protected:
 	void* m_hIDComDev;
-	OVERLAPPED m_OverlappedRead, m_OverlappedWrite;
+
+	// These are pointers to be able to use OVERLAPPED with forward declaration
+	OVERLAPPED* m_OverlappedRead;
+	OVERLAPPED* m_OverlappedWrite;
 
 	int32 m_Port;
 	int32 m_Baud;

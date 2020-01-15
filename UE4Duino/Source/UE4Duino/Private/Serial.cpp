@@ -2,6 +2,10 @@
 
 #include "Serial.h"
 
+#include "Windows/AllowWindowsPlatformTypes.h"
+#include "Windows/MinWindows.h"
+#include "Windows/HideWindowsPlatformTypes.h"
+
 #define BOOL2bool(B) B == 0 ? false : true
 
 USerial* USerial::OpenComPort(bool &bOpened, int32 Port, int32 BaudRate)
@@ -48,16 +52,26 @@ TArray<uint8> USerial::FloatToBytes(const float &Float)
 USerial::USerial()
 	: WriteLineEnd(ELineEnd::n)
 	, m_hIDComDev(NULL)
+	, m_OverlappedRead(nullptr)
+	, m_OverlappedWrite(nullptr)
 	, m_Port(-1)
 	, m_Baud(-1)
 {
-	FMemory::Memset(&m_OverlappedRead, 0, sizeof(OVERLAPPED));
-	FMemory::Memset(&m_OverlappedWrite, 0, sizeof(OVERLAPPED));
+	// Allocate the OVERLAPPED structs
+	m_OverlappedRead = new OVERLAPPED();
+	m_OverlappedWrite = new OVERLAPPED();
+
+	FMemory::Memset(m_OverlappedRead, 0, sizeof(OVERLAPPED));
+	FMemory::Memset(m_OverlappedWrite, 0, sizeof(OVERLAPPED));
 }
 
 USerial::~USerial()
 {
 	Close();
+
+	// Delete allocated OVERLAPPED structs
+	delete m_OverlappedRead;
+	delete m_OverlappedWrite;
 }
 
 bool USerial::Open(int32 nPort, int32 nBaud)
@@ -89,8 +103,8 @@ bool USerial::Open(int32 nPort, int32 nBaud)
 		return false;
 	}
 
-	FMemory::Memset(&m_OverlappedRead, 0, sizeof(OVERLAPPED));
-	FMemory::Memset(&m_OverlappedWrite, 0, sizeof(OVERLAPPED));
+	FMemory::Memset(m_OverlappedRead, 0, sizeof(OVERLAPPED));
+	FMemory::Memset(m_OverlappedWrite, 0, sizeof(OVERLAPPED));
 
 	COMMTIMEOUTS CommTimeOuts;
 	//CommTimeOuts.ReadIntervalTimeout = 10;
@@ -101,8 +115,8 @@ bool USerial::Open(int32 nPort, int32 nBaud)
 	CommTimeOuts.WriteTotalTimeoutConstant = 10;
 	SetCommTimeouts(m_hIDComDev, &CommTimeOuts);
 
-	m_OverlappedRead.hEvent = CreateEvent(NULL, true, false, NULL);
-	m_OverlappedWrite.hEvent = CreateEvent(NULL, true, false, NULL);
+	m_OverlappedRead->hEvent = CreateEvent(NULL, true, false, NULL);
+	m_OverlappedWrite->hEvent = CreateEvent(NULL, true, false, NULL);
 
 	dcb.DCBlength = sizeof(DCB);
 	GetCommState(m_hIDComDev, &dcb);
@@ -111,12 +125,12 @@ bool USerial::Open(int32 nPort, int32 nBaud)
 
 	if (!SetCommState(m_hIDComDev, &dcb) ||
 		!SetupComm(m_hIDComDev, 10000, 10000) ||
-		m_OverlappedRead.hEvent == NULL ||
-		m_OverlappedWrite.hEvent == NULL)
+		m_OverlappedRead->hEvent == NULL ||
+		m_OverlappedWrite->hEvent == NULL)
 	{
 		unsigned long dwError = GetLastError();
-		if (m_OverlappedRead.hEvent != NULL) CloseHandle(m_OverlappedRead.hEvent);
-		if (m_OverlappedWrite.hEvent != NULL) CloseHandle(m_OverlappedWrite.hEvent);
+		if (m_OverlappedRead->hEvent != NULL) CloseHandle(m_OverlappedRead->hEvent);
+		if (m_OverlappedWrite->hEvent != NULL) CloseHandle(m_OverlappedWrite->hEvent);
 		CloseHandle(m_hIDComDev);
 		m_hIDComDev = NULL;
 		UE_LOG(LogTemp, Error, TEXT("Failed to setup port COM%d. Error: %08X"), nPort, dwError);
@@ -134,8 +148,8 @@ void USerial::Close()
 {
 	if (!m_hIDComDev) return;
 
-	if (m_OverlappedRead.hEvent != NULL) CloseHandle(m_OverlappedRead.hEvent);
-	if (m_OverlappedWrite.hEvent != NULL) CloseHandle(m_OverlappedWrite.hEvent);
+	if (m_OverlappedRead->hEvent != NULL) CloseHandle(m_OverlappedRead->hEvent);
+	if (m_OverlappedWrite->hEvent != NULL) CloseHandle(m_OverlappedWrite->hEvent);
 	CloseHandle(m_hIDComDev);
 	m_hIDComDev = NULL;
 
@@ -172,13 +186,13 @@ FString USerial::ReadStringUntil(bool &bSuccess, uint8 Terminator)
 			&Byte,
 			1,
 			&dwBytesRead,
-			&m_OverlappedRead));
+			m_OverlappedRead));
 
 		if (!bReadStatus)
 		{
 			if (GetLastError() == ERROR_IO_PENDING)
 			{
-				WaitForSingleObject(m_OverlappedRead.hEvent, 2000);
+				WaitForSingleObject(m_OverlappedRead->hEvent, 2000);
 			}
 			else
 			{
@@ -246,13 +260,13 @@ uint8 USerial::ReadByte(bool &bSuccess)
 		&Byte,
 		1,
 		&dwBytesRead,
-		&m_OverlappedRead));
+		m_OverlappedRead));
 
 	if (!bReadStatus)
 	{
 		if (GetLastError() == ERROR_IO_PENDING)
 		{
-			WaitForSingleObject(m_OverlappedRead.hEvent, 2000);
+			WaitForSingleObject(m_OverlappedRead->hEvent, 2000);
 		}
 		else
 		{
@@ -285,13 +299,13 @@ TArray<uint8> USerial::ReadBytes(int32 Limit)
 		Buffer,
 		Limit,
 		&dwBytesRead,
-		&m_OverlappedRead));
+		m_OverlappedRead));
 
 	if (!bReadStatus)
 	{
 		if (GetLastError() == ERROR_IO_PENDING)
 		{
-			WaitForSingleObject(m_OverlappedRead.hEvent, 2000);
+			WaitForSingleObject(m_OverlappedRead->hEvent, 2000);
 		}
 		else
 		{
@@ -344,18 +358,18 @@ bool USerial::WriteBytes(TArray<uint8> Buffer)
 	bool bWriteStat;
 	unsigned long dwBytesWritten;
 
-	bWriteStat = BOOL2bool(WriteFile(m_hIDComDev, Buffer.GetData(), Buffer.Num(), &dwBytesWritten, &m_OverlappedWrite));
+	bWriteStat = BOOL2bool(WriteFile(m_hIDComDev, Buffer.GetData(), Buffer.Num(), &dwBytesWritten, m_OverlappedWrite));
 	if (!bWriteStat && (GetLastError() == ERROR_IO_PENDING))
 	{
-		if (WaitForSingleObject(m_OverlappedWrite.hEvent, 1000))
+		if (WaitForSingleObject(m_OverlappedWrite->hEvent, 1000))
 		{
 			dwBytesWritten = 0;
 			return false;
 		}
 		else
 		{
-			GetOverlappedResult(m_hIDComDev, &m_OverlappedWrite, &dwBytesWritten, false);
-			m_OverlappedWrite.Offset += dwBytesWritten;
+			GetOverlappedResult(m_hIDComDev, m_OverlappedWrite, &dwBytesWritten, false);
+			m_OverlappedWrite->Offset += dwBytesWritten;
 			return true;
 		}
 	}
