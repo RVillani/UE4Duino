@@ -46,10 +46,12 @@ public:
 	 * @param bOpened If the serial port was successfully opened.
 	 * @param Port The serial port to open.
 	 * @param BaudRate BaudRate to open the serial port with.
+	 * @param DTR Enable/Disable DTR communication protocol.
+	 * @param RTS Enable/Disable RTS communication protocol.
 	 * @return A Serial instance to work with the opened port.
 	 */
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Open Serial Port"), Category = "UE4Duino", meta = (Keywords = "com arduino serial start"))
-	static USerial* OpenComPort(bool &bOpened, int32 Port = 1, int32 BaudRate = 9600);
+	static USerial* OpenComPort(bool &bOpened, int32 Port = 1, int32 BaudRate = 9600, bool DTR = true, bool RTS = true);
 
 	/**
 	 * Utility function to convert 4 bytes into an Integer. If the input array's length is not 4, returns 0.
@@ -94,10 +96,12 @@ public:
 	 *
 	 * @param Port The serial port to open.
 	 * @param BaudRate BaudRate to open the serial port with.
+	 * @param DTR enable/disable DTR protocol
+	 * @param RTS enable/disable RTS protocol
 	 * @return If the serial port was successfully opened.
 	 */
 	UFUNCTION(BlueprintCallable, meta=(DisplayName = "Open Port"), Category = "UE4Duino", meta = (Keywords = "com start init"))
-	bool Open(int32 Port = 2, int32 BaudRate = 9600);
+	bool Open(int32 Port = 2, int32 BaudRate = 9600, bool DTR = true, bool RTS = true);
 	/**
 	 * Close and end the communication with the serial port. If not open, do nothing.
 	 */
