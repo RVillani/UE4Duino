@@ -8,10 +8,10 @@
 
 #define BOOL2bool(B) B == 0 ? false : true
 
-USerial* USerial::OpenComPort(bool &bOpened, int32 Port, int32 BaudRate)
+USerial* USerial::OpenComPort(bool &bOpened, int32 Port, int32 BaudRate, bool DTR, bool RTS))
 {
 	USerial* Serial = NewObject<USerial>();
-	bOpened = Serial->Open(Port, BaudRate);
+	bOpened = Serial->Open(Port, BaudRate, DTR, RTS);
 	return Serial;
 }
 
@@ -74,7 +74,7 @@ USerial::~USerial()
 	delete m_OverlappedWrite;
 }
 
-bool USerial::Open(int32 nPort, int32 nBaud)
+bool USerial::Open(int32 nPort, int32 nBaud, bool bDTR, bool bRTS)
 {
 	if (nPort < 0)
 	{
@@ -122,6 +122,23 @@ bool USerial::Open(int32 nPort, int32 nBaud)
 	GetCommState(m_hIDComDev, &dcb);
 	dcb.BaudRate = nBaud;
 	dcb.ByteSize = 8;
+	if (bDTR == true)
+	{ 
+		dcb.fDtrControl = DTR_CONTROL_ENABLE;
+	}
+	else
+	{ 
+		dcb.fDtrControl = DTR_CONTROL_DISABLE;
+	}
+
+	if (bRTS == true)
+	{
+		dcb.fRtsControl = RTS_CONTROL_ENABLE;
+	}
+	else
+	{
+		dcb.fRtsControl = RTS_CONTROL_DISABLE;
+	}
 
 	if (!SetCommState(m_hIDComDev, &dcb) ||
 		!SetupComm(m_hIDComDev, 10000, 10000) ||
